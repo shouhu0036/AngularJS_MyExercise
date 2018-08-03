@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .directive("productTable", function(){
+            return {
+                restrict: "EACM",
+                scope: {
+                    productData: "=productTable",
+                    total: "=totalValue"
+                },
+                controller: function($scope, $element, $attrs){
+                    this.updateTotal = function(){
+                        var totalQuantity = 0;
+                        for(var i = 0; i < $scope.productData.length; i++){
+                            if($scope.productData[i].hasOwnProperty("quantity")){
+                                totalQuantity += $scope.productData[i].quantity;
+                            }
+                        }
+
+                        $scope.total = totalQuantity;
+                    };
+                },
+                link: function(scope, element, attrs, ctrl, transclude){
+
+                }
+            };
+        })
+        .directive("productItem", function(){
+            return {
+                restrict: "EACM",
+                require: "^productTable",
+                template:   "<td> {{ item.name }} </td>" +
+                            "<td> <input type='number' ng-model='item.quantity' /> </td>",
+                link: function(scope, element, attrs, ctrl, transclude){
+                    scope.$watch("item.quantity", function(oldVal, newVal){
+                        ctrl.updateTotal();
+                    });
+                }
+            };
+        })
+        .directive("resetQuantity", function($http){
+            return {
+                restrict: "EACM",
+                require: "^productTable",
+                scope: {
+                    resetData: "=resetQuantity",
+                    propName: "@propertyName"
+                },
+                template:   "<td colspan='2'> " +
+                                "<button class='btn btn-info' ng-click='reset()'> Reset Quantity </button> " +
+                            "</td>",
+                link: function(scope, element, attrs, ctrl, transclude){
+                    scope.reset = function(){
+                        $http({
+                            method: 'GET',
+                            url: 'JSON/productData.json'
+                        }).then(function(successData){
+                            scope.resetData = successData.data;
+                            ctrl.updateTotal();
+                        });
+                    };
+                }
+            };
+        })
+        .controller("myCtrl", function($scope, $http){
+            $http({
+                method: 'GET',
+                url: 'JSON/productData.json'
+            }).then(function(successData){
+                $scope.products = successData.data;
+                $scope.totalQuantity = -1;
+            });
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+    <br />
+    <table class="table table-bordered table-striped" product-table="products" total-value="totalQuantity">
+        <tr>
+            <th>Name</th>
+            <th>Quantity</th>
+        </tr>
+        <tr ng-repeat="item in products" product-item></tr>
+        <tr>
+            <td>Total Quantity: </td>
+            <td> {{ totalQuantity }} </td>
+        </tr>
+
+        <tr reset-quantity="products" property-name="quantity"></tr>
+    </table>
+
+</body>
+</html>

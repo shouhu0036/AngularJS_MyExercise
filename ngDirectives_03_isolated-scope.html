@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .directive("myList", function($window){
+            return {
+                restrict: "EA",
+                template:   '<div class="panel-body">' +
+                                '<br />' +
+                                '<p>Name: <input ng-model="scopeData.name"/> </p>' +
+                                '<p>City: <input ng-model="scopeCity" /> </p>' +
+                                '<p>Country: {{ countryFn() }} </p>' +
+                            '</div>',
+                scope: {
+                    scopeCity: "@cityProp",
+                    scopeData: "=nameProp",
+                    countryFn: "&myCountry"
+                },
+                link: function(scope, element, attrs){
+                    scope.$watch("scopeCity", function(newVal, oldVal){
+                        $window.alert("Directive scopeCity Changed from " + oldVal + " to " + newVal);
+                    });
+                }
+            };
+        })
+        .controller("myCtrl", function($scope, $http){
+            $scope.data = { name: "Kobe Bryant" };
+            $scope.city = "Random";
+            $scope.getCountry = function(name){
+                return name === "Kobe Bryant"? "United States" : "Unknown";
+            };
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+    <div class="panel-body">
+        <p>Direct Binding: <input ng-model="city" /> </p>
+    </div>
+    <div my-list="products" city-prop="{{ city + '_No.1' }}" name-prop="{ name: 'Ben Simons' }" my-country="getCountry('bbb')"></div>
+    <div my-list="products" city-prop="{{ city + '_No.2' }}" name-prop="{ name: 'Tim Duncan' }" my-country="getCountry('xxx')"></div>
+    <div my-list="products" city-prop="{{ city + '_No.3' }}" name-prop="data" my-country="getCountry(data.name)"></div>
+</body>
+</html>

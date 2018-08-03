@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        $(document).ready(function(){
+            $("#clickBtn").click(function(evt){
+                var ele = document.getElementById("countArea");
+                angular.element(ele).scope().$apply("handleClick()");
+                // angular.element(countArea).scope().$apply("handleClick()");  // angular.element(id) or angular.element(element)
+            });
+        });
+
+        angular.module("myApp",[])
+         .controller("myCtrl", function($scope, $http, $rootScope, $window, $log){
+            $scope.clickCount = 0;
+            $scope.buttonEnabled = true;
+
+            $scope.handleClick = function(){
+                $scope.clickCount++;
+            };
+
+            $scope.$watch("buttonEnabled", function(newVal){
+                $("#clickBtn").prop("disabled", !newVal);
+            });
+        });
+    </script>
+</head>
+
+<body class="container" ng-cloak="">
+    <div ng-controller="myCtrl" id="countArea">
+        <input type="checkbox" ng-model="buttonEnabled"> Enable Button Click
+        <br />
+        <p> Click Count: {{ clickCount }} </p>
+    </div>
+    <br />
+    <button class="btn btn-info" id="clickBtn"> Click </button>
+</body>
+</html>

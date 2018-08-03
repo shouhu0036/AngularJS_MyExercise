@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .config(function(logServiceCProvider){
+            logServiceCProvider.debugModeEnabled(true);
+        })
+        .factory("logServiceA", function(){
+            var msgCount = 0;
+            return {
+                log: function(msg){
+                    console.log("logServiceA (" + (msgCount++) + "): " + msg);
+                }
+            };
+        })
+        .service("logServiceB", function(){
+            var msgCount = 0;
+            return {
+                log: function(msg){
+                    console.log("logServiceB (" + (msgCount++) + "): " + msg);
+                }
+            };
+        })
+        .provider("logServiceC", function(){
+            var debug = true;
+
+            return {
+                debugModeEnabled: function(setting){
+                    if(angular.isDefined(setting)){
+                        debug = setting;
+                        return this;
+                    }else{
+                        return debug;
+                    }
+                },
+                $get: function(){
+                    var msgCount = 0;
+                    return {
+                        log: function(msg){
+                            console.log("logServiceC (" + (msgCount++) + "): " + msg);
+                        }
+                    };
+                }
+            };
+        })
+        .controller("myCtrl", function($scope, $http, logServiceA, logServiceB, logServiceC){
+          $scope.products = [];
+          $http({
+            method: 'GET',
+            url: 'JSON/productData.json'
+          }).then(function(successData){
+              $scope.products = successData.data;
+              logServiceA.log(successData.statusText);
+              logServiceA.log(successData.status);
+              logServiceB.log(successData.statusText);
+              logServiceB.log(successData.status);
+              logServiceC.log(successData.statusText);
+              logServiceC.log(successData.status);
+          });
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+
+</body>
+</html>

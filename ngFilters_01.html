@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+         .controller("myCtrl", function($scope, $http, $rootScope, $window, $log){
+             $scope.products = [];
+             $scope.limitVal = 6;
+             $scope.filterString = "fruiT";
+             $scope.getDate = function(expiryDays){
+                 var retDate = new Date();
+                 retDate.setDate(expiryDays);
+                 return retDate;
+             };
+
+             $http({
+                 method: 'GET',
+                 url: 'JSON/productData.json'
+             }).then(function(successData){
+                if(angular.isArray(successData.data)){
+                    $scope.products = successData.data;
+                }
+             });
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl" ng-cloak="">
+    <h4>Products</h4>
+    Limit To:
+    <select ng-options="item as item for item in [1,2,3,4,5,6,7,8,9]" ng-model="limitVal"></select>
+    <br /><br />
+    <table class="table table-bordered">
+        <thead>
+            <tr class="bg-primary">
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Expiry</th>
+                <th>JSON</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="prod in products | limitTo: limitVal | filter: {category: filterString}" class="bg-info">
+                <td>{{ prod.name | uppercase }}</td>
+                <td>{{ prod.category | uppercase}}</td>
+                <td>{{ prod.price | currency: '£' }}</td>
+                <td>{{ getDate(prod.expiry) | date: "dd/MM/yyyy"}}</td>
+                <td> {{ prod | json }}</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

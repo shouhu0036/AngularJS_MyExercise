@@ -1,0 +1,20 @@
+<table>
+    <thead>
+    <tr class="bg-primary">
+        <th>Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Expiry</th>
+        <th>JSON</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="prod in data">
+        <td>{{ prod.name }}</td>
+        <td>{{ prod.category | uppercase}}</td>
+        <td>{{ prod.price | currency: '£' }}</td>
+        <td>{{ getDate(prod.expiry) | date: "dd/MM/yyyy"}}</td>
+        <td> {{ prod | json }}</td>
+    </tr>
+    </tbody>
+</table>

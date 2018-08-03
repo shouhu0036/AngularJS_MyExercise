@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .directive("myExpression", function($compile){
+            return function(scope, element, attrs, ctrl, transclude){
+                var compileFn = $compile("<ol><li ng-repeat='cityX in cities'> {{ cityX }} </li></ol>");        // Compile the html directly.
+                var compileElement = compileFn(scope);      // Assign the scope and get the compiled element.
+
+                // compileElement.appendTo(element);
+                element.append(compileElement);
+            }
+        })
+        .directive("myExpressionB", function($compile){
+            return function(scope, element, attrs, ctrl, transclude){
+                var myElement = angular.element("<ol><li ng-repeat='cityX in cities'> {{ cityX }} </li></ol>");  // Create an element (jqLite object) first.
+                var compileFn = $compile(myElement);            // Compile the element or jqLite object.
+                var compileElement = compileFn(scope);          // Assign the scope and get the compiled element.
+
+                // compileElement.appendTo(element);
+                element.append(compileElement);
+            }
+        })
+        .controller("myCtrl", function($scope, $http){
+            $scope.cities = ["London", "New York", "Houston"];
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+    <div class="well">
+        <span my-expression></span>
+    </div>
+
+    <div class="well">
+        <span my-expression-b></span>
+    </div>
+</body>
+</html>

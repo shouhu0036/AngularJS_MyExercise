@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .directive("triButton", function(){
+            return {
+                restrict: "EA",
+                replace: "true",
+                require: "ngModel",
+                template:   "<div class='well'>" +
+                                "<h3> Choose your button</h3>" +
+                                "<div class='btn-group'>" +
+                                    "<button class='btn btn-default'>Yes</button> " +
+                                    "<button class='btn btn-default'>No</button> " +
+                                    "<button class='btn btn-default'>Random</button>" +
+                                    "<button class='btn btn-default'>Not Sure</button>" +
+                                "</div>" +
+                            "</div>",
+                link: function(scope, element, attrs, ctrl, transclude){
+                    var setSelectedBtn = function(val){
+                        var buttons = element.find("button");
+                        for(var i = 0; i < buttons.length; i++){
+                            var buttonX = buttons.eq(i);
+                            buttonX.removeClass("btn-primary");
+                            if(buttonX.text().trim() === val){
+                                buttonX.addClass("btn-primary");
+                            }
+                        }
+                    };
+
+                    ctrl.$render = function(){
+                        setSelectedBtn( ctrl.$viewValue );
+                    };
+
+                    element.on("click", function(event){               // Handle internal click event.
+                        setSelectedBtn(event.target.innerText);
+                        ctrl.$setViewValue(event.target.innerText);     // Change the data-bound value.
+                        scope.$apply();                                 // $apply() will call the ctrl.$render() function.
+                    });
+                }
+            };
+        })
+        .controller("myCtrl", function($scope){
+
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+    <div>
+        <tri-button ng-model="btnVal"></tri-button>
+    </div>
+    <div class="well">
+        Value:
+        <select ng-model="btnVal">
+            <option selected="selected">Yes</option>
+            <option>No</option>
+            <option>Random</option>
+            <option>Not Sure</option>
+        </select>
+    </div>
+</body>
+</html>

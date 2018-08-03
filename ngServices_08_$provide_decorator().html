@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .config(function($provide){
+            $provide.decorator("$log", function($delegate){
+                // Angular will instantiate the $log service object and pass it as the $delegate argument to the $provide.decorator() function.
+                $delegate.originLog = $delegate.log;
+                $delegate.log = function(message){
+                    $delegate.originLog("Message after $provide.decorator() is: " + message);
+                };
+
+                return $delegate;
+            });
+        })
+        .controller("myCtrl", function($scope,$log){
+            $scope.handleClick = function(){
+              $log.log("Button Clicked!");
+            };
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+    <div class="well">
+        <button class="btn btn-primary" ng-click="handleClick()"> Click Me </button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+          .directive("unorderedList", function(){
+              return {
+                  restrict: "ECA",      // E - Element; A - Attribute; C - Class; M - Comment;
+                  link: function(scope, element, attrs){
+                    var listData = scope[attrs["unorderedList"]];
+                    var propertyExp = attrs["productProperty"];
+
+                    if(angular.isArray(listData)){
+                        //var ulElement = angular.element("<ul>");
+
+                        var propertyName = (propertyExp.split("|"))[0].trim();
+                        var tableElem = angular.element("<table>");
+                        var headRow = angular.element("<tr>");
+                        var headCell = angular.element("<td>").text(propertyName);
+                        tableElem.append(headRow);
+                        headRow.append(headCell);
+
+                        for(var i = 0; i < listData.length; i++){
+                            (function(){    // Immediate implemented Function Expression. Otherwise the i will
+                                // var liElement = angular.element("<li>");
+                                // ulElement.append(liElement);
+
+                                var bodyRow = angular.element("<tr>");
+                                var bodyCell = angular.element("<td>");
+                                tableElem.append(bodyRow);
+                                bodyRow.append(bodyCell);
+
+                                var index = i;      // Use the closure to preserve the i;
+
+                                var watchFn = function(watchScope){
+                                    return watchScope.$eval(propertyExp, listData[index]);
+                                };
+
+                                scope.$watch(watchFn, function(newVal, oldVal){
+                                    // liElement.text(newVal);
+                                    bodyCell.text(newVal);
+                                });
+                            })();
+                        }
+                    }
+
+                    // element.append(ulElement);
+                    element.append(tableElem);
+                    tableElem.attr("ng-class", "{'table table-bordered' : true}");    // ng-class is added, but the bootstrap effect is not displayed as expected.
+                    tableElem.addClass("table table-striped");  // class is added, but the bootstrap effect is not displayed as expected.
+                  }
+              };
+          })
+          .controller("myCtrl", function($scope, $http){
+              $scope.products = [];
+              $scope.products = [
+                  { name: "Apples", category: "Fruit", price: 1.20, expiry: 10 },
+                  { name: "Bananas", category: "Fruit", price: 2.42, expiry: 7 },
+                  { name: "Pears", category: "Fruit", price: 2.02, expiry: 6 }
+              ];
+              $http({
+                method: 'GET',
+                url: 'JSON/productData.json'
+              }).then(function(successData){
+                  $scope.products = successData.data;
+              });
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+<br /><br />
+    <div unordered-list="products" product-property="price | currency: '£'"></div>
+<br /><br />
+    <table ng-class="{'table table-bordered' : true}">
+        <tr><td>TEST ROW</td></tr>
+        <tr><td>TEST ROW</td></tr>
+    </table>
+</body>
+</html>

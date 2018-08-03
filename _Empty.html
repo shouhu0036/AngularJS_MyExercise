@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+          .controller("myCtrl", function($scope, $http){
+              $scope.products = [];
+              $http({
+                method: 'GET',
+                url: 'JSON/productData.json'
+              }).then(function(successData){
+                  $scope.products = successData.data;
+              });
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .config(function($interpolateProvider){
+            $interpolateProvider.startSymbol("{{{");
+            $interpolateProvider.endSymbol("}}}");
+        })
+        .directive("myExpression", function($interpolate){
+            var interpolationFn = $interpolate("The total value is: {{{ total | currency: '£ '}}}");
+            return {
+                scope:{
+                    dataValue: "=amount",
+                    taxToPay: "=tax"
+                },
+                link: function(scope, element, attrs, ctrl, transclude){
+                    scope.$watch("dataValue", function(newVal){
+                        var localData = {
+                            total: Number(newVal) * (1 + Number(scope.taxToPay))
+                        };
+
+                        element.text(interpolationFn(localData));
+                    });
+                }
+
+            };
+        })
+        .controller("myCtrl", function($scope){
+            $scope.dataVal = 200.88;
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+<div class="well">
+    <p>
+        <input ng-model="dataVal" type="text" title="expression" class="form-control">
+    </p>
+    <br />
+    <span my-expression amount="dataVal" tax="0.25"></span>
+</div>
+</body>
+</html>

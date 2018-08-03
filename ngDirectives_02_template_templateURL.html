@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .directive("myList", function($http){
+            return {
+                restrict: "EA",
+                templateUrl: function(element, attrs){
+                    return attrs["templateType"] === "list" ? "ngTemplates/itemTemplate.html" : "ngTemplates/tableTemplate.html";
+                },
+                link: function(scope, element, attrs){
+                    $http({
+                        method: 'GET',
+                        url: 'JSON/productData.json'
+                    }).then(function(successData){
+                        scope.products = successData.data;
+                        scope.data = scope[attrs["myList"]];
+                    });
+                },
+                replace: true
+            };
+        })
+        .controller("myCtrl", function($scope){
+            $scope.getDate = function(expiryDays){
+                var retDate = new Date();
+                retDate.setDate(expiryDays);
+                return retDate;
+            };
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+    <div my-list="products" class="table table-bordered" template-type="table"></div>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+         .filter("switchCase", function(){                      //Switch each letter to opposite case. Use it twice will return to the original case.
+             return function(value){
+                if(angular.isString(value)){
+                    var newValue = "";
+                    for(var i = 0; i < value.length; i++){
+                        var letter = value.charAt(i);
+                        if(letter === letter.toUpperCase()){
+                            letter = letter.toLowerCase();
+                        }else{
+                            letter = letter.toUpperCase();
+                        }
+                        newValue += letter;
+                    }
+
+                    return newValue;
+                }else{
+                    return value;
+                }
+             };
+         })
+         .filter("skip", function(){
+             return function(data, count){
+                 if(angular.isArray(data) && angular.isNumber(count)){
+                     if(count < 1 || count > data.length){
+                         return data;
+                     }else{
+                         // dataArr.slice(start, end);
+                         // dataArr.splice(index, removeHowMany, item1,...,itemX)
+                         return data.slice(count);
+                     }
+                 }else{
+                     return data;
+                 }
+             };
+         })
+         .filter("take", function($filter){
+             return function(data, skipCount, takeCount){
+                if(angular.isNumber(skipCount)){
+                    var skipped = $filter("skip")(data, skipCount);
+                    if(angular.isNumber(takeCount)){
+                        return $filter("limitTo")(skipped, takeCount);
+                    }else{
+                        return skipped;
+                    }
+                }else{
+                    return data;
+                }
+             };
+         })
+         .controller("myCtrl", function($scope, $http, $rootScope, $window, $log){
+             $scope.products = [];
+             $scope.getDate = function(expiryDays){
+                 var retDate = new Date();
+                 retDate.setDate(expiryDays);
+                 return retDate;
+             };
+             $scope.skipNum = 0;
+             $scope.limitNum = 8;
+
+             $http({
+                 method: 'GET',
+                 url: 'JSON/productData.json'
+             }).then(function(successData){
+                if(angular.isArray(successData.data)){
+                    $scope.products = successData.data;
+                }
+             });
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl" ng-cloak="">
+    <h4>Products</h4>
+    skip:
+    <select ng-options="item as item for item in [0,1,2,3,4,5,6]" ng-model="skipNum"></select> &nbsp; &nbsp;
+    Limit To:
+    <select ng-options="item as item for item in [1,2,3,4,5,6,7,8,9]" ng-model="limitNum"></select> <br /><br />
+    <table class="table table-bordered">
+        <thead>
+            <tr class="bg-primary">
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Expiry</th>
+                <th>JSON</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="prod in products | take:skipNum:limitNum" class="bg-info">
+                <td>{{ prod.name | switchCase | switchCase }}</td>
+                <td>{{ prod.category | switchCase | switchCase}}</td>
+                <td>{{ prod.price | currency: '£' }}</td>
+                <td>{{ getDate(prod.expiry) | date: "dd/MM/yyyy"}}</td>
+                <td> {{ prod | json }}</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

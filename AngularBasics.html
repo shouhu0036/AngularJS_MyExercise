@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        var myApp = angular.module("myApp",[]);
+        myApp.controller("myCtrl", function($scope, $http){
+            var myArr = [1,2,3];
+            var myDate = new Date();
+            var myEle = document.querySelector('h3');
+            $scope.isArray = angular.isArray(myArr);
+            $scope.isDate = angular.isDate(myDate);
+            $scope.isObject = angular.isObject(myDate);
+            $scope.isDefined = angular.isDefined(myDate);
+            $scope.isElement = angular.isElement(myEle);
+            $scope.isFunction = angular.isFunction(myDate.getFullYear);
+            $scope.isNumber = angular.isNumber(myDate.getFullYear());
+            $scope.isString = angular.isString(myDate.toDateString());
+            $scope.isUndefined = angular.isUndefined(null);         // null value is not undefined.
+
+            $http({
+                method: 'GET',
+                url: 'JSON/productData.json'
+            }).then(function(successData){
+                var jsonStr = angular.toJson(successData.data);
+                $scope.isJson = angular.fromJson(jsonStr);
+                $scope.isObject = angular.isObject("");
+            });
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+    <h3 id="angularX'"></h3>
+    Array: <input type="text" ng-model="isArray"> <br/>
+    Date: <input type="text" ng-model="isDate"><br/>
+    Object: <input type="text" ng-model="isObject"><br/>
+    Defined: <input type="text" ng-model="isDefined"><br/>
+    isElement: <input type="text" ng-model="isElement"><br/>
+    isFunction: <input type="text" ng-model="isFunction"><br/>
+    isNumber: <input type="text" ng-model="isNumber"><br/>
+    isString: <input type="text" ng-model="isString"><br/>
+    null isUndefined: <input type="text" ng-model="isUndefined"><br/>
+    <br />
+    is JSON: <input type="text" ng-model="isJson"><br/>
+</body>
+</html>

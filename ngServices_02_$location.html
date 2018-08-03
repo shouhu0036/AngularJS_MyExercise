@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .config(function($locationProvider){
+            $locationProvider.html5Mode({
+               enabled: true,
+               requireBase: false
+            });
+        })
+        .controller("myCtrl", function($scope, $http, $location, $anchorScroll){
+            $scope.$on("$locationChangeStart", function(event, newUrl){
+                console.log("URL begins to change");
+            });
+
+            $scope.$on("$locationChangeSuccess", function(event, newUrl){
+                $scope.url = newUrl;                // This contains the initialization of the $scope.url
+            });
+
+            $scope.setUrl = function(component, newValue){
+                switch(component){
+                    case "reset":
+                        $location.path("");
+                        $location.hash("");
+                        $location.search("");
+                        break;
+                    case "path":
+                        $location.path("/cities/london");       // http://localhost/cities/london
+                        break;
+                    case "hash":
+                        $location.hash("north");                // http://localhost/cities/london#north
+                        break;
+                    case "search":
+                        $location.search("select", "hotel");    // http://localhost/cities/london?select=hotel
+                        break;
+                    case "url":
+                        $location.url("/cities/london?select=hotels#north");    // http://localhost/cities/london?select=hotels#north
+                        break;
+                    default:
+                        break;
+                }
+            };
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+    <br />
+    <div class="panel-body">
+        URL:
+        <p> {{ url }}</p>
+    </div>
+    <div class="panel-body">
+        <div class="btn-group ">
+            <button class="btn btn-primary" ng-click="setUrl('reset')">Reset</button>
+            <button class="btn btn-primary" ng-click="setUrl('path')">Path</button>
+            <button class="btn btn-primary" ng-click="setUrl('hash')">Hash</button>
+            <button class="btn btn-primary" ng-click="setUrl('search')">Search</button>
+            <button class="btn btn-primary" ng-click="setUrl('url')">URL</button>
+        </div>
+    </div>
+</body>
+</html>

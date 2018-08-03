@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        var myApp = angular.module("myApp",[]);
+        myApp.controller("myCtrl", function($scope, $http){
+            $scope.ngData = [];
+            $http({
+                method: 'GET',
+                url: 'JSON/productData.json'
+            }).then(function(successData){
+                $scope.ngData = successData.data;
+            });
+        });
+    </script>
+    <style>
+        .oddRow { background-color: #ffff00; }
+        .evenRow {background-color: #008000; }
+    </style>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td> Id </td>
+                <td> Name </td>
+                <td> Category </td>
+                <td> Price </td>
+                <td> Expiry </td>
+            </tr>
+        </thead>
+        <tr ng-repeat="item in ngData" ng-class="$odd ? 'oddRow' : 'evenRow'">
+            <td ng-if="$first"> <abbr title="First Item"> {{ $index + 1}} </abbr> </td>
+            <td ng-if="$last"> <abbr title="Last Item"> {{ $index + 1}} </abbr> </td>
+            <td ng-if="$middle"> <abbr title="Not First Nor Last Item"> {{ $index + 1}} </abbr> </td>
+
+            <td> {{ item.name }}</td>
+            <td> {{ item.category }}</td>
+            <td> {{ item.price }}</td>
+            <td> {{ item.expiry }}</td>
+        </tr>
+    </table>
+
+    <table class="table table-bordered">
+        <tr ng-repeat-start="item in ngData" ng-class="$odd ? 'oddRow' : 'evenRow'">
+           <td> Id: {{ $index + 1 }}</td>
+        </tr>
+        <tr ng-class="$odd ? 'oddRow' : 'evenRow'">
+            <td> Name: {{ item.name }}</td>
+        </tr>
+        <tr ng-repeat-end ng-class="$odd ? 'oddRow' : 'evenRow'">
+            <td> Price: {{ item.price }}</td>
+        </tr>
+    </table>
+</body>
+</html>

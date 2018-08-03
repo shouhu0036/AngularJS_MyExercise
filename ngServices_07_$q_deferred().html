@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .directive("promiseWorker", function($q){
+            var deferred = $q.defer();
+            return {
+                link: function(scope, element, attrs, ctrl, transclude){
+                    element.find("button").on("click", function(event){
+                        var buttonTxt = event.target.innerText;
+                        if(buttonTxt === "Abort"){
+                            deferred.reject("Aborted!");
+                        }else{
+                            deferred.resolve(buttonTxt);
+                        }
+                    });
+                },
+                controller: function($scope, $element, $attrs){
+                    this.promise = deferred.promise;
+                }
+            };
+        })
+        .directive("promiseObserver", function(){
+            return {
+                require: "^promiseWorker",
+                link: function(scope, element, attrs, ctrl, transclude){
+                    ctrl.promise.then(function(result){
+                        return "Success (" + result + ")";
+                    }, function(reason){
+                        return "Failed! (reason: " + reason + ")";
+                    }).then(function(result){
+                        element.text(result);
+                    });
+                }
+            };
+        })
+        .controller("myCtrl", function($scope, $http){
+
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+    <div class="well" promise-worker>
+        <button class="btn btn-primary">Heads</button>
+        <button class="btn btn-primary">Trails</button>
+        <button class="btn btn-primary">Abort</button>
+        <br /><br />
+        Outcome: <span promise-observer></span>
+    </div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .directive("myPanel", function($http){
+            return {
+                transclude: true,
+                restrict: "EA",
+                template:   '<div class="panel panel-default">' +
+                                '<br />' +
+                                '<p>Template Panel</p>' +
+                                '<div class="panel-body" ng-transclude=""></div>' +
+                            '</div>',
+                link: function(scope, element, attrs, ctrl, transclude){
+                    $http({
+                        method: 'GET',
+                        url: 'JSON/productData.json'
+                    }).then(function(successData){
+                        scope.scopeData = successData.data;
+                    });
+
+                    transclude(scope, function(clone){              // Call the transclude(scope, transcludeContentFn) manually.
+                        var divElem2 = angular.element("<div>");
+                        divElem2.addClass("panel panel-body");
+                        divElem2.append(clone);                      // clone object represent the embedded content or element.
+                        element.append(divElem2);
+                    });
+
+                    var content = transclude();                   // Call the transclude() manually, which returns the embedded content or element.
+                    var divElem = angular.element("<div>");
+                    divElem.addClass("panel panel-body");
+                    divElem.append(content);
+                    element.append(divElem);
+                }
+            };
+        })
+        .controller("myCtrl", function($scope){
+          $scope.mainData = { name: "Tim Duncan"};
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+    <my-panel>
+        <p> This is from "Transclude" datasource: {{ mainData.name }}</p>
+    </my-panel>
+</body>
+</html>

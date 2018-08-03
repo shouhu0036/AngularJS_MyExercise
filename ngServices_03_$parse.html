@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>Angular JS Demo</title>
+    <script>
+        angular.module("myApp",[])
+        .directive("myExpression", function($parse){
+            var expressionFn = $parse("total | currency: '£ '");
+            return {
+                scope:{
+                    dataValue: "=amount",
+                    taxToPay: "=tax"
+                },
+                link: function(scope, element, attrs, ctrl, transclude){
+                    scope.$watch("dataValue", function(newVal){
+                        var localData = {
+                            total: Number(newVal) * (1 + Number(scope.taxToPay))
+                        };
+
+                        var total = expressionFn(scope, localData);
+                        element.text("Total Value (including Tax): " + total);
+                    });
+                }
+            };
+        })
+        .controller("myCtrl", function($scope, $parse){
+            $scope.dataVal = 200.88;
+            var localData = {
+                user: { name: "Kobe Bryant"}
+            };
+
+            $scope.scopeData = {
+                user: {name: "Lebron James"}
+            };
+
+            var getter = $parse("user.name");
+            var setter = getter.assign;
+
+            console.log(getter($scope.scopeData));              // Lebron James
+            setter($scope.scopeData, "Lebron James Junior");    // Set the "user.name" in $scope.scopeData to "Lebron James Junior"
+            console.log(getter($scope.scopeData));              // Lebron James Junior
+
+            console.log(getter($scope.scopeData, localData));       // Kobe Bryant
+            console.log(getter(localData));                         // Kobe Bryant
+            setter(localData, "Kobe Junior X");
+            console.log(getter($scope.scopeData, localData));       // Kobe Junior X
+            console.log(getter(localData));                         // Kobe Junior X
+        });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+<div class="well">
+    <p>
+        <input ng-model="dataVal" type="text" title="expression" class="form-control">
+    </p>
+    <br />
+    <span my-expression amount="dataVal" tax="0.25"></span>
+</div>
+
+</body>
+</html>
