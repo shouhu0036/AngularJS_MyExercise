@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="exampleApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.css">
+    <script type="application/javascript" src="libs/jquery-3.2.0.js"></script>
+    <script type="application/javascript" src="libs/angular/angular.js"></script>
+    <title>AngularJS config() and run() Demo (duplicate)</title>
+    <script>
+        angular.module("exampleApp",["exampleApp.Controllers","exampleApp.Services"])
+            .constant("startTime", new Date().toLocaleTimeString())
+            .config(function(startTime,baseURL, serviceURL){
+                console.log("Main App Config: " + startTime + ",baseURL: " + baseURL + ", serviceURL:" + serviceURL);
+            })
+            .run(function(startTime){
+                console.log("Main App Run: " + startTime);
+            })
+            .controller("myCtrl", function($scope, $http){ });
+
+        angular.module("exampleApp.Controllers", [])
+            .constant("baseURL", "http://localhost/")
+            .config(function(baseURL){
+                console.log("App.Controllers Config: " + baseURL);
+            })
+            .run(function(startTime, baseURL){
+                console.log("App.Controllers Run: " + baseURL + " at: " + startTime);
+            })
+            .controller("subAppCtrl", function(){ });
+
+        angular.module("exampleApp.Services",[])
+            .constant("serviceURL", "https://localhost:8080/")
+            .config(function(serviceURL, baseURL){
+                console.log("App.Services Config: " + serviceURL +  ",baseURL: " + baseURL);
+            })
+            .run(function(startTime, serviceURL, baseURL){
+                console.log("App.Services Run: " + serviceURL + " at: " + startTime +  ",baseURL: " + baseURL);
+            })
+            .controller("subServiceCtrl", function(){ });
+    </script>
+</head>
+
+<body class="container" ng-controller="myCtrl">
+
+</body>
+</html>
